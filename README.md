@@ -1,2 +1,2 @@
 # test-dev-squad
-Test for DesSquad
+Test for DevSquad
