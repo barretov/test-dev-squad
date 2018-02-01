@@ -1,24 +1,37 @@
 <template lang="html">
-	<h1>Board</h1>
+	<div class="col-xs-12 col-sm-3 col-md-2">
+		<div class="form-group">
+			<input class="form-control">
+		</div>
+		<div class="form-group">
+			<button class="btn btn-info">Add</button>
+			<button class="btn btn-default">X</button>
+		</div>
+	</div>
 </template>
 
 <script>
 export default {
-  props: {
-  	data: {
-  		a: 'dasdas',
-  	},
-    board: {
-    }
-  },
+	name: 'custom-board',
 
-  methods: {
-    addBoard () {
-   		console.log("Board");
-    },
-  },
+	props: {
+		name: {type: String, required: true},
+	},
 
-  components: {
-  }
-}
-</script>
+	// data: function() {
+	// 	console.log("estou no componente board...");
+	// 	return {
+	// 		object
+	// 	}
+	// 	},
+
+		components: {
+		}
+	}
+	</script>
+
+	<style lang="scss" scoped>
+	.board {
+		background-color: green;
+	}
+	</style>
