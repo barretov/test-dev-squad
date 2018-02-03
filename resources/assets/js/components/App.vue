@@ -1,43 +1,37 @@
 <template>
-	<div class="board">
-		<div class="cards">
-			<div class="empty-state" v-show="!boards.length">Sem Listas ainda :P</div>
-			<board v-for="board in boards" :name="board.name"></board>
+	<div>
+		<div v-for="list in getLists" :key="list.id" :id="list.id" :lis="list">
+			<List/>
 		</div>
-		<div class="col-sm-3 col-md-2">
-			<button @click="addBoard()" class="btn btn-default">Add a list...</button>
-			<!-- <board ref="board" /> -->
-		</div>
-	</div>
 
+		<button @click="addList" class="btn btn-primary">Add List...</button>
+	</div>
 </template>
 
 <script>
-import Board from './Board'
+import List from './List'
+import store from '../vuex/store'
 
 export default {
 	name: 'app',
 	components: {
-		Board,
-	},
-
-	data: function () {
-		return {
-			boards: []
-		}
+		List
 	},
 
 	methods: {
-		addBoard() {
-			console.log("adding board");
-
-			var board = {
-				id: 1,
-				name: 'board1'
-			}
-
-			this.boards.push(board)
+		addList() {
+			console.log("addlist");
+			this.$store.commit('addList')
 		},
-	}
+	},
+
+	computed: {
+		getLists() {
+			let a = this.$store.state.lists
+			console.log(a)
+			return a
+		}
+	},
+	store
 }
 </script>
