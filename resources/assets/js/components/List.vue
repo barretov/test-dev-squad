@@ -6,7 +6,7 @@
 				<input v-model="titleList" class="form-control" @blur="saveList"
 				 @focus="options = true" placeholder="New List...">
 
-				<button @click="delList" class="btn-link pull-right bottom"
+				<button @click="dialog" class="btn-link pull-right bottom"
 				v-if="options" @focus="options = true">
 					Delete List <i class="glyphicon glyphicon-trash"></i>
 				</button>
@@ -23,6 +23,7 @@
 			</div>
 		</div>
 
+		<v-dialog/>
 	</div>
 </template>
 
@@ -54,7 +55,25 @@ export default {
 		},
 		addCard() {
 			this.$store.commit('ADDCARD', this.id)
-		}
+		},
+		dialog() {
+		  this.$modal.show('dialog', {
+		    title: 'Delete list',
+		    text: 'Are you sure? It will remove all cards of this list!',
+		    buttons: [
+		      {
+		        title: '<span class="text-primary">'
+		        	+'No <i class="glyphicon glyphicon-remove"></i></span>',
+		        default: true
+		      },
+		      {
+		        title: '<span class="text-danger">'
+		        	+'Yes <i class="glyphicon glyphicon-ok"></i></span>',
+		        handler: () => {this.$modal.hide('dialog'), this.delList()}
+		      }
+		   ]
+		  })
+		},
 	},
 
 	computed: {

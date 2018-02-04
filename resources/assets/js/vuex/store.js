@@ -58,7 +58,7 @@ export default new Vuex.Store({
  * Function to identify the object id in the index List
  * @param  {array} array Data array
  * @param  {int} id Id of object
- * @return {int} Id of object on array
+ * @return {int} Index for operations
  */
  function arrayIndex(array, id) {
  	for (var i = array.length -1; i >= 0; i--) {
