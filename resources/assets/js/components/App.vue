@@ -1,10 +1,14 @@
 <template>
 	<div>
-		<div v-for="list in getLists" :key="list.id" :id="list.id" :lis="list">
-			<List/>
+		<div v-for="list in getLists" :key="list.id">
+			<List :id="list.id"/>
 		</div>
 
-		<button @click="addList" class="btn btn-primary">Add List...</button>
+		<div class="col-xs-3">
+			<button @click="addList" class="btn btn-primary">
+				Add List <i class="glyphicon glyphicon-list"></i>
+			</button>
+		</div>
 	</div>
 </template>
 
@@ -13,24 +17,20 @@ import List from './List'
 import store from '../vuex/store'
 
 export default {
-	name: 'app',
-	components: {
-		List
-	},
-
 	methods: {
 		addList() {
-			console.log("addlist");
-			this.$store.commit('addList')
+			this.$store.commit('ADDLIST')
 		},
 	},
 
 	computed: {
 		getLists() {
-			let a = this.$store.state.lists
-			console.log(a)
-			return a
+			return this.$store.state.lists
 		}
+	},
+
+	components: {
+		List
 	},
 	store
 }
