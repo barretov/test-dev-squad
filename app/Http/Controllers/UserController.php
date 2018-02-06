@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\User;
 
-class HomeController extends Controller
+class UserController extends Controller
 {
+
     /**
      * Create a new controller instance.
      *
@@ -17,12 +19,12 @@ class HomeController extends Controller
     }
 
     /**
-     * Show the application dashboard.
+     * Method for return all users
      *
-     * @return \Illuminate\Http\Response
+     * @return object users of system
      */
-    public function index()
+    public function list()
     {
-        return view('home');
+        return \Response::json(User::all(), 200);
     }
 }

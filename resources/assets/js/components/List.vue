@@ -6,14 +6,15 @@
 				<input v-model="titleList" class="form-control" @blur="saveList"
 				 @focus="options = true" placeholder="New List...">
 
-				<button @click="dialog" class="btn-link pull-right bottom"
-				v-if="options" @focus="options = true">
+				<button @click="dialog" v-if="options" class="btn-link pull-right bottom" @focus="options = true">
 					Delete List <i class="glyphicon glyphicon-trash"></i>
 				</button>
 			</div>
 
 			<div class="col-xs-12" v-for="card in getCards" :key="card.id">
-				<card v-if="card.idLst === id" :id="card.id" :idLst="card.idLst"/>
+			<draggable v-model="dragCard" :options="{group:'cards'}">
+					<card v-if="card.idLst === id" :id="card.id" :idLst="card.idLst" :user="user"/>
+			</draggable>
 			</div>
 
 			<div class="form-group">
@@ -29,10 +30,13 @@
 
 <script>
 import Card from './Card'
+import draggable from 'vuedraggable'
 
 export default {
-	props: {
+	props:
+	 {
 		'id': {type: Number, required: true},
+		'user': {type: String, required: true},
 	},
 
 	data: function () {
@@ -79,11 +83,30 @@ export default {
 	computed: {
 		getCards() {
 			return this.$store.state.cards
+		},
+		dragCard: {
+		    get(value) {
+		    	// ### @TODO: Remove this debug #### //
+		    	console.log("drag get " + value );
+		        return this.$store.state.cards
+		    	console.log(this.$store.state.cards)
+		    },
+		    set(value) {
+		    	// ### @TODO: Remove this debug #### //
+		    	console.log("drag set", value);
+		        this.$store.commit('SAVECARD', value)
+		    }
 		}
 	},
 
 	components: {
 		Card,
+		draggable
 	}
 }
 </script>
+<style>
+.drag-area {
+	 min-height: 20px;
+}
+</styel>

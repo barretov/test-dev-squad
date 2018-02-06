@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div v-for="list in getLists" :key="list.id">
-			<List :id="list.id"/>
+			<List :id="list.id" :user="user"></List>
 		</div>
 
 		<div class="col-xs-3">
@@ -17,6 +17,8 @@ import List from './List'
 import store from '../vuex/store'
 
 export default {
+	props: ['user'],
+
 	methods: {
 		addList() {
 			this.$store.commit('ADDLIST')
