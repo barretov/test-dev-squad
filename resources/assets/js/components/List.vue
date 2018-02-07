@@ -11,11 +11,13 @@
 				</button>
 			</div>
 
+				<draggable v-model="dragCard" :options="{group:'cards'}">
+					<transition-group>
 			<div class="col-xs-12" v-for="card in getCards" :key="card.id">
-			<draggable v-model="dragCard" :options="{group:'cards'}">
-					<card v-if="card.idLst === id" :id="card.id" :idLst="card.idLst" :user="user"/>
-			</draggable>
+						<card v-if="card.idLst === id" :id="card.id" :idLst="card.idLst" :user="user"/>
 			</div>
+					</transition-group>
+				</draggable>
 
 			<div class="form-group">
 				<button @click="addCard" class="btn-link">
@@ -42,7 +44,7 @@ export default {
 	data: function () {
 		return {
 			titleList: '',
-			options: false
+			options: false,
 		}
 	},
 
@@ -88,14 +90,30 @@ export default {
 		    get(value) {
 		    	// ### @TODO: Remove this debug #### //
 		    	console.log("drag get " + value );
+		    	// console.log("lista")
+		    	// ### @TODO: Remove this debug #### //
+		    	// console.log(this.lista);
 		        return this.$store.state.cards
-		    	console.log(this.$store.state.cards)
 		    },
 		    set(value) {
+
+		    	console.log("value")
+		    	console.log(value);
+		    	// console.log("lista")
 		    	// ### @TODO: Remove this debug #### //
-		    	console.log("drag set", value);
-		        this.$store.commit('SAVECARD', value)
-		    }
+		    	// console.log(this.lista);
+		        this.$store.commit('DRAGCARD', value)
+		    	// ### @TODO: Remove this debug #### //
+		    	// console.log("passou-----------------------")
+		    	// for (var i = value.length - 1; i >= 0; i--) {
+		    		// console.log('id: '+ value[0].idLst)
+		    		// value[i].idLst = this.idTarget
+			        // this.$store.commit('SAVECARD', value[i])
+		    	// }
+		    },
+		    handleChange() {
+		         console.log('changed');
+		       },
 		}
 	},
 

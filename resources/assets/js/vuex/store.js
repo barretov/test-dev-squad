@@ -39,27 +39,18 @@ const mutations = {
 	},
 
 	SAVECARD (state, data) {
-
-		if (1 == data.length) {
-			// ### @TODO: Remove this debug #### //
-			let index = arrayIndex(state.cards, data.id)
-			console.log("zero ou negativo"  +  index);
-		}
-
-		// state.cards[index].data = data.data
-		// state.cards[index].id = data.id
-		// state.cards[index].idLst = data.idLst
-		// state.cards[index].owner = data.owner
+		let index = arrayIndex(state.cards, data.id)
+		state.cards[index].data = data.data
+		state.cards[index].id = data.id
+		state.cards[index].idLst = data.idLst
+		state.cards[index].owner = data.owner
 	},
 
 	DRAGCARD (state, data) {
+		state.cards = data
 		// ### @TODO: Remove this debug #### //
-		console.log("### Drag ### "  +  data);
-		let index = arrayIndex(state.cards, data.id)
-		state.cards[index].data = data.data
-		// state.cards[index].id = data.id
-		// state.cards[index].idLst = data.idlst
-		// state.cards[index].owner = data.owner
+		// console.log(data)
+			// state.cards = data
 	},
 
 

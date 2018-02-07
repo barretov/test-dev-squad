@@ -43183,6 +43183,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 
 
@@ -43242,13 +43244,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			get: function get(value) {
 				// ### @TODO: Remove this debug #### //
 				console.log("drag get " + value);
+				// console.log("lista")
+				// ### @TODO: Remove this debug #### //
+				// console.log(this.lista);
 				return this.$store.state.cards;
-				console.log(this.$store.state.cards);
 			},
 			set: function set(value) {
+
+				console.log("value");
+				console.log(value);
+				// console.log("lista")
 				// ### @TODO: Remove this debug #### //
-				console.log("drag set", value);
-				this.$store.commit('SAVECARD', value);
+				// console.log(this.lista);
+				this.$store.commit('DRAGCARD', value);
+				// ### @TODO: Remove this debug #### //
+				// console.log("passou-----------------------")
+				// for (var i = value.length - 1; i >= 0; i--) {
+				// console.log('id: '+ value[0].idLst)
+				// value[i].idLst = this.idTarget
+				// this.$store.commit('SAVECARD', value[i])
+				// }
+			},
+			handleChange: function handleChange() {
+				console.log('changed');
 			}
 		}
 	},
@@ -43608,40 +43626,43 @@ var render = function() {
               : _vm._e()
           ]),
           _vm._v(" "),
-          _vm._l(_vm.getCards, function(card) {
-            return _c(
-              "div",
-              { key: card.id, staticClass: "col-xs-12" },
-              [
-                _c(
-                  "draggable",
-                  {
-                    attrs: { options: { group: "cards" } },
-                    model: {
-                      value: _vm.dragCard,
-                      callback: function($$v) {
-                        _vm.dragCard = $$v
-                      },
-                      expression: "dragCard"
-                    }
-                  },
-                  [
-                    card.idLst === _vm.id
-                      ? _c("card", {
-                          attrs: {
-                            id: card.id,
-                            idLst: card.idLst,
-                            user: _vm.user
-                          }
-                        })
-                      : _vm._e()
-                  ],
-                  1
-                )
-              ],
-              1
-            )
-          }),
+          _c(
+            "draggable",
+            {
+              attrs: { options: { group: "cards" } },
+              model: {
+                value: _vm.dragCard,
+                callback: function($$v) {
+                  _vm.dragCard = $$v
+                },
+                expression: "dragCard"
+              }
+            },
+            [
+              _c(
+                "transition-group",
+                _vm._l(_vm.getCards, function(card) {
+                  return _c(
+                    "div",
+                    { key: card.id, staticClass: "col-xs-12" },
+                    [
+                      card.idLst === _vm.id
+                        ? _c("card", {
+                            attrs: {
+                              id: card.id,
+                              idLst: card.idLst,
+                              user: _vm.user
+                            }
+                          })
+                        : _vm._e()
+                    ],
+                    1
+                  )
+                })
+              )
+            ],
+            1
+          ),
           _vm._v(" "),
           _c("div", { staticClass: "form-group" }, [
             _c(
@@ -43654,7 +43675,7 @@ var render = function() {
             )
           ])
         ],
-        2
+        1
       ),
       _vm._v(" "),
       _c("v-dialog")
@@ -43717,26 +43738,17 @@ var mutations = {
 		state.idxCard++;
 	},
 	SAVECARD: function SAVECARD(state, data) {
-
-		if (1 == data.length) {
-			// ### @TODO: Remove this debug #### //
-			var index = arrayIndex(state.cards, data.id);
-			console.log("zero ou negativo" + index);
-		}
-
-		// state.cards[index].data = data.data
-		// state.cards[index].id = data.id
-		// state.cards[index].idLst = data.idLst
-		// state.cards[index].owner = data.owner
-	},
-	DRAGCARD: function DRAGCARD(state, data) {
-		// ### @TODO: Remove this debug #### //
-		console.log("### Drag ### " + data);
 		var index = arrayIndex(state.cards, data.id);
 		state.cards[index].data = data.data;
-		// state.cards[index].id = data.id
-		// state.cards[index].idLst = data.idlst
-		// state.cards[index].owner = data.owner
+		state.cards[index].id = data.id;
+		state.cards[index].idLst = data.idLst;
+		state.cards[index].owner = data.owner;
+	},
+	DRAGCARD: function DRAGCARD(state, data) {
+		state.cards = data;
+		// ### @TODO: Remove this debug #### //
+		// console.log(data)
+		// state.cards = data
 	},
 	DELCARD: function DELCARD(state, id) {
 		var index = arrayIndex(state.cards, id);
@@ -47743,7 +47755,7 @@ exports = module.exports = __webpack_require__(54)(false);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
