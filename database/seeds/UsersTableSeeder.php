@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Database\Seeds;
+// namespace App\Database\Seeds;
 
 use App\User;
 use Illuminate\Database\Seeder;
 
-class UserTableSeeder extends Seeder
+class UsersTableSeeder extends Seeder
 {
     public function run()
     {
