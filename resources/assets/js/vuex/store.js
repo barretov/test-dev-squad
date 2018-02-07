@@ -4,19 +4,27 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 const state = {
-	idxList: 1,
+	idx: 1,
 	idxCard: 1,
 	lists: [],
 	cards: [],
 }
 
 const mutations = {
+	// ADDLIST (state) {
+	// 	state.lists.push({
+	// 		id: state.idxList,
+	// 		name: state.idxList
+	// 	})
+	// 	state.idxList++
+	// },
 	ADDLIST (state) {
 		state.lists.push({
-			id: state.idxList,
-			name: state.idxList
+			id: state.idx,
+			name: state.idx,
+			cards: []
 		})
-		state.idxList++
+		state.idx++
 	},
 
 	SAVELIST (state, data) {
@@ -29,30 +37,58 @@ const mutations = {
 		state.lists.splice(index, 1)
 	},
 
+	// ADDCARD (state, id) {
+	// 	state.cards.push({
+	// 		idLst: id,
+	// 		id: state.idxCard,
+	// 		data: state.idxCard
+	// 	})
+	// 	state.idxCard++
+	// },
 	ADDCARD (state, id) {
-		state.cards.push({
+		let index = arrayIndex(state.lists, id)
+
+		state.lists[index].cards.push({
 			idLst: id,
-			id: state.idxCard,
-			data: state.idxCard
+			id: state.idx,
+			data: state.idx
 		})
-		state.idxCard++
+		state.idx++
 	},
 
+	// SAVECARD (state, data) {
+	// 	let index = arrayIndex(state.cards, data.id)
+	// 	state.cards[index].data = data.data
+	// 	state.cards[index].id = data.id
+	// 	state.cards[index].idLst = data.idLst
+	// 	state.cards[index].owner = data.owner
+	// },
+
 	SAVECARD (state, data) {
-		let index = arrayIndex(state.cards, data.id)
-		state.cards[index].data = data.data
-		state.cards[index].id = data.id
-		state.cards[index].idLst = data.idLst
-		state.cards[index].owner = data.owner
+		console.log("savecard")
+		console.log(data)
+		let index = arrayIndex(state.lists, data.idLst)
+		let indexId = arrayIndex(state.lists[index].cards, data.id)
+		console.log("index: " + index)
+		console.log("indexId: " + indexId)
+
+			state.lists[index].cards[indexId].data = data.data,
+			state.lists[index].cards[indexId].id = data.id,
+			state.lists[index].cards[indexId].idLst = data.idLst,
+			state.lists[index].cards[indexId].owner = data.owner
 	},
 
 	DRAGCARD (state, data) {
-		state.cards = data
-		// ### @TODO: Remove this debug #### //
-		// console.log(data)
-			// state.cards = data
+		let index = arrayIndex(state.lists, data[0].id)
+		// change idLst of moved cards
+		for (var i = data.length - 1; i >= 0; i--) {
+			data[i].idLst = data[0].id
+		};
+		data.splice(0, 1)
+		console.log("DRAGCARD")
+		console.log(data)
+		state.lists[index].cards = data
 	},
-
 
 	DELCARD (state, id) {
 		let index = arrayIndex(state.cards, id)
