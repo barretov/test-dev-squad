@@ -27,7 +27,7 @@ export default {
 
 	computed: {
 		getLists() {
-			return this.$store.state.lists
+			return this.$store.state.store
 		}
 	},
 

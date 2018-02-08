@@ -11,13 +11,11 @@
 				</button>
 			</div>
 
-				<draggable v-model="dragCard" :options="{group:'cards'}" >
-					<transition-group>
-						<div class="col-xs-12" v-for="card in getCards" :key="card.id">
-							<card :id="card.id" :idLst="card.idLst" :user="user"/>
-						</div>
-					</transition-group>
-				</draggable>
+			<draggable v-model="dragCard" :options="{group:'cards'}" class="drag-area col-xs-12">
+				<div v-for="card in getCards" :key="card.id">
+					<card :id="card.id" :idLst="card.idLst" :user="user" :data="card.data"/>
+				</div>
+			</draggable>
 
 			<div class="form-group">
 				<button @click="addCard" class="btn-link">
@@ -84,40 +82,21 @@ export default {
 
 	computed: {
 		getCards() {
-			// return this.$store.state.lists[0].cards
-			let array = this.$store.state.lists
+			let data = this.$store.state.store
 
-			for (var i = array.length -1; i >= 0; i--) {
-				if (array[i].id === this.id) {
-					return array[i].cards
+			for (var i = data.length -1; i >= 0; i--) {
+				if (data[i].id === this.id) {
+					return data[i].cards
 				}
 			};
 		},
 		dragCard: {
-		    get(value) {
-		        let array = this.$store.state.lists
-
-		        for (var i = array.length -1; i >= 0; i--) {
-		        	if (array[i].id === this.id) {
-		        		return array[i].cards
-		        	}
-		        };
+		    get() {
+				this.getCards
 		    },
 		    set(value) {
-		    	value.push({id: this.id})
-		    	value.reverse()
-		        this.$store.commit('DRAGCARD', value)
-		    	// ### @TODO: Remove this debug #### //
-		    	// console.log("passou-----------------------")
-		    	// for (var i = value.length - 1; i >= 0; i--) {
-		    		// console.log('id: '+ value[0].idLst)
-		    		// value[i].idLst = this.idTarget
-			        // this.$store.commit('SAVECARD', value[i])
-		    	// }
+		        this.$store.commit('DRAGCARD', {idLst: this.id, value: value})
 		    },
-		    handleChange() {
-		         console.log('changed');
-		       },
 		}
 	},
 

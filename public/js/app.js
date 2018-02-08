@@ -43082,7 +43082,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 	computed: {
 		getLists: function getLists() {
-			return this.$store.state.lists;
+			return this.$store.state.store;
 		}
 	},
 
@@ -43178,7 +43178,7 @@ exports = module.exports = __webpack_require__(44)(false);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -43566,8 +43566,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
 
 
 
@@ -43620,40 +43618,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 	computed: {
 		getCards: function getCards() {
-			// return this.$store.state.lists[0].cards
-			var array = this.$store.state.lists;
+			var data = this.$store.state.store;
 
-			for (var i = array.length - 1; i >= 0; i--) {
-				if (array[i].id === this.id) {
-					return array[i].cards;
+			for (var i = data.length - 1; i >= 0; i--) {
+				if (data[i].id === this.id) {
+					return data[i].cards;
 				}
 			};
 		},
 
 		dragCard: {
-			get: function get(value) {
-				var array = this.$store.state.lists;
-
-				for (var i = array.length - 1; i >= 0; i--) {
-					if (array[i].id === this.id) {
-						return array[i].cards;
-					}
-				};
+			get: function get() {
+				this.getCards;
 			},
 			set: function set(value) {
-				value.push({ id: this.id });
-				value.reverse();
-				this.$store.commit('DRAGCARD', value);
-				// ### @TODO: Remove this debug #### //
-				// console.log("passou-----------------------")
-				// for (var i = value.length - 1; i >= 0; i--) {
-				// console.log('id: '+ value[0].idLst)
-				// value[i].idLst = this.idTarget
-				// this.$store.commit('SAVECARD', value[i])
-				// }
-			},
-			handleChange: function handleChange() {
-				console.log('changed');
+				this.$store.commit('DRAGCARD', { idLst: this.id, value: value });
 			}
 		}
 	},
@@ -43758,20 +43737,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 
-
 /* harmony default export */ __webpack_exports__["default"] = ({
 	props: {
 		'id': { type: Number, required: true },
 		'idLst': { type: Number, required: true },
-		'user': { type: String, required: true }
+		'user': { type: String, required: true },
+		'data': { type: String, required: true }
 	},
 	data: function data() {
 		return {
 			users: '',
-			combo: '',
-			dataCard: '',
-			cardOwner: '',
-			options: false
+			dataCard: this.data,
+			owner: '',
+			emailInvite: '',
+			flOwner: false,
+			flInvite: false,
+			flInpOwner: false
 		};
 	},
 
@@ -43780,11 +43761,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			var _this = this;
 
 			axios.get('/users').then(function (response) {
-				for (var i = response.data.length - 1; i >= 0; i--) {
-					_this.combo += '<option>';
-					_this.combo += response.data[i].name;
-					_this.combo += '</option>';
-				}
+				_this.users = response.data;
 			}).catch(function (err) {
 				console.log(err);
 			});
@@ -43799,10 +43776,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				data: this.dataCard,
 				owner: this.user
 			});
-			this.options = false;
+			this.flOwner = false;
+			this.flInvite = false;
 		},
 		delCard: function delCard() {
-			this.$store.commit('DELCARD', this.id);
+			this.$store.commit('DELCARD', { idLst: this.idLst, id: this.id });
 		},
 		dialogDelCard: function dialogDelCard() {
 			var _this2 = this;
@@ -43816,50 +43794,30 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				}, {
 					title: '<span class="text-danger">Yes <i class="glyphicon glyphicon-ok"></i></span>',
 					handler: function handler() {
-						_this2.$modal.hide('dialog'), _this2.delCard(_this2.cardOwner);
+						_this2.$modal.hide('dialog'), _this2.delCard();
 					}
 				}]
 			});
-		},
-		listOwner: function listOwner() {
-			var _this3 = this;
-
-			this.$modal.show('dialog', {
-				title: 'Card owner',
-				text: '<select v-model="cardOwner" class="form-control" @focus="options = true">' + '<option selected>Select a user...</option>' + '<option "invite">Invite a person</option>' + this.combo + '</select>',
-				buttons: [{
-					title: '<span class="text-default">Cancel <i class="glyphicon glyphicon-remove"></i></span>',
-					default: true
-				}, {
-					title: '<span class="text-primary">Save <i class="glyphicon glyphicon-ok"></i></span>',
-					handler: function handler() {
-						_this3.$modal.hide('dialog'), _this3.changeOwner();
-					}
-				}]
-			});
-			this.options = false;
 		},
 		changeOwner: function changeOwner() {
-			console.log(this.cardOwner);
-
-			switch (this.cardOwner) {
-				case 'invite':
-					// ### @TODO: Remove this debug #### //
-					console.log("invite");
-					break;
-
-				case '0':
-					console.log("0");
-					break;
-
-				default:
-					console.log("default");
-					console.log(this.cardOwner);
-					break;
+			if (0 == this.owner) {
+				this.flInvite = true;
+			} else {
+				this.flInpOwner = false;
+				this.flOwner = false;
 			}
+			// @TODO:, salvar mudança no banco
+		},
+		invite: function invite() {
+			// ### @TODO: Remove this debug #### //
+			console.log("### is here ### ");
+			this.owner = this.emailInvite;
+			this.flOwner = false;
+			this.flInvite = false;
+			this.flInpOwner = false;
+			// @TODO:, Send email to invite
 		}
 	}
-
 });
 
 /***/ }),
@@ -43887,7 +43845,7 @@ var render = function() {
         on: {
           blur: _vm.saveCard,
           focus: function($event) {
-            _vm.options = true
+            _vm.flOwner = true
           },
           input: function($event) {
             if ($event.target.composing) {
@@ -43897,47 +43855,176 @@ var render = function() {
           }
         }
       }),
-      _vm._v("\n\t\t" + _vm._s(_vm.getUsers) + "\n\n\t\t"),
-      _vm.options
-        ? _c("div", [
-            _c(
-              "button",
-              {
-                staticClass: "btn-link",
-                on: {
-                  click: _vm.listOwner,
-                  focus: function($event) {
-                    _vm.options = true
-                  }
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          directives: [
+            {
+              name: "show",
+              rawName: "v-show",
+              value: _vm.flOwner,
+              expression: "flOwner"
+            }
+          ]
+        },
+        [
+          _c(
+            "button",
+            {
+              staticClass: "btn-link",
+              on: {
+                click: function($event) {
+                  _vm.flInpOwner = true
+                },
+                focus: function($event) {
+                  _vm.flOwner = true
                 }
-              },
-              [
-                _c("i", { staticClass: "glyphicon glyphicon-user" }),
-                _vm._v(
-                  " " + _vm._s(_vm.user.substr(0, 15) + "...") + "\n\t\t\t"
-                )
-              ]
-            ),
+              }
+            },
+            [
+              _c("i", { staticClass: "glyphicon glyphicon-user" }),
+              _vm._v(
+                " " +
+                  _vm._s(
+                    _vm.owner != 0
+                      ? _vm.owner.substr(0, 13)
+                      : _vm.user.substr(0, 13)
+                  ) +
+                  " ...\n\t\t\t"
+              )
+            ]
+          ),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn-link pull-right",
+              on: {
+                click: _vm.dialogDelCard,
+                focus: function($event) {
+                  _vm.flOwner = true
+                }
+              }
+            },
+            [
+              _vm._v("\n\t\t\t\tDelete card "),
+              _c("i", { staticClass: "glyphicon glyphicon-trash" })
+            ]
+          )
+        ]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          directives: [
+            {
+              name: "show",
+              rawName: "v-show",
+              value: _vm.flInpOwner,
+              expression: "flInpOwner"
+            }
+          ],
+          on: { change: _vm.changeOwner }
+        },
+        [
+          _vm._v("\n\t\t\t" + _vm._s(_vm.getUsers) + "\n\t\t\t"),
+          _c(
+            "select",
+            {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.owner,
+                  expression: "owner"
+                }
+              ],
+              staticClass: "form-control",
+              on: {
+                change: function($event) {
+                  var $$selectedVal = Array.prototype.filter
+                    .call($event.target.options, function(o) {
+                      return o.selected
+                    })
+                    .map(function(o) {
+                      var val = "_value" in o ? o._value : o.value
+                      return val
+                    })
+                  _vm.owner = $event.target.multiple
+                    ? $$selectedVal
+                    : $$selectedVal[0]
+                }
+              }
+            },
+            [
+              _c("option", { attrs: { disabled: "", value: "" } }, [
+                _vm._v("Select a worner")
+              ]),
+              _vm._v(" "),
+              _c("option", { attrs: { value: "0" } }, [
+                _vm._v("Invite a person")
+              ]),
+              _vm._v(" "),
+              _vm._l(_vm.users, function(user) {
+                return _c("option", [_vm._v(_vm._s(user.name))])
+              })
+            ],
+            2
+          )
+        ]
+      )
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        directives: [
+          {
+            name: "show",
+            rawName: "v-show",
+            value: _vm.flInvite,
+            expression: "flInvite"
+          }
+        ]
+      },
+      [
+        _c("div", { staticClass: "form-group" }, [
+          _c("div", { staticClass: "input-group" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.emailInvite,
+                  expression: "emailInvite"
+                }
+              ],
+              staticClass: "form-control",
+              attrs: { type: "email", placeholder: "E-mail to invite" },
+              domProps: { value: _vm.emailInvite },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.emailInvite = $event.target.value
+                }
+              }
+            }),
             _vm._v(" "),
-            _c(
-              "button",
-              {
-                staticClass: "btn-link pull-right",
-                on: {
-                  click: _vm.dialogDelCard,
-                  focus: function($event) {
-                    _vm.options = true
-                  }
-                }
-              },
-              [
-                _vm._v("\n\t\t\t\tDelete this card "),
-                _c("i", { staticClass: "glyphicon glyphicon-trash" })
-              ]
-            )
+            _c("span", { staticClass: "input-group-btn" }, [
+              _c(
+                "button",
+                { staticClass: "btn btn-primary", on: { click: _vm.invite } },
+                [_c("i", { staticClass: "glyphicon glyphicon-send" })]
+              )
+            ])
           ])
-        : _vm._e()
-    ])
+        ])
+      ]
+    )
   ])
 }
 var staticRenderFns = []
@@ -45979,6 +46066,7 @@ var render = function() {
           _c(
             "draggable",
             {
+              staticClass: "drag-area col-xs-12",
               attrs: { options: { group: "cards" } },
               model: {
                 value: _vm.dragCard,
@@ -45988,28 +46076,23 @@ var render = function() {
                 expression: "dragCard"
               }
             },
-            [
-              _c(
-                "transition-group",
-                _vm._l(_vm.getCards, function(card) {
-                  return _c(
-                    "div",
-                    { key: card.id, staticClass: "col-xs-12" },
-                    [
-                      _c("card", {
-                        attrs: {
-                          id: card.id,
-                          idLst: card.idLst,
-                          user: _vm.user
-                        }
-                      })
-                    ],
-                    1
-                  )
-                })
+            _vm._l(_vm.getCards, function(card) {
+              return _c(
+                "div",
+                { key: card.id },
+                [
+                  _c("card", {
+                    attrs: {
+                      id: card.id,
+                      idLst: card.idLst,
+                      user: _vm.user,
+                      data: card.data
+                    }
+                  })
+                ],
+                1
               )
-            ],
-            1
+            })
           ),
           _vm._v(" "),
           _c("div", { staticClass: "form-group" }, [
@@ -46056,21 +46139,12 @@ __WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_1_vuex
 
 var state = {
 	idx: 1,
-	idxCard: 1,
-	lists: [],
-	cards: []
+	store: []
 };
 
 var mutations = {
-	// ADDLIST (state) {
-	// 	state.lists.push({
-	// 		id: state.idxList,
-	// 		name: state.idxList
-	// 	})
-	// 	state.idxList++
-	// },
 	ADDLIST: function ADDLIST(state) {
-		state.lists.push({
+		state.store.push({
 			id: state.idx,
 			name: state.idx,
 			cards: []
@@ -46078,67 +46152,40 @@ var mutations = {
 		state.idx++;
 	},
 	SAVELIST: function SAVELIST(state, data) {
-		var index = arrayIndex(state.lists, data.id);
-		state.lists[index].name = data.name;
+		var index = arrayIndex(state.store, data.id);
+		state.store[index].name = data.name;
 	},
 	DELLIST: function DELLIST(state, id) {
-		var index = arrayIndex(state.lists, id);
-		state.lists.splice(index, 1);
+		var index = arrayIndex(state.store, id);
+		state.store.splice(index, 1);
 	},
-
-
-	// ADDCARD (state, id) {
-	// 	state.cards.push({
-	// 		idLst: id,
-	// 		id: state.idxCard,
-	// 		data: state.idxCard
-	// 	})
-	// 	state.idxCard++
-	// },
 	ADDCARD: function ADDCARD(state, id) {
-		var index = arrayIndex(state.lists, id);
+		var index = arrayIndex(state.store, id);
 
-		state.lists[index].cards.push({
+		state.store[index].cards.push({
 			idLst: id,
 			id: state.idx,
-			data: state.idx
+			data: ''
 		});
 		state.idx++;
 	},
-
-
-	// SAVECARD (state, data) {
-	// 	let index = arrayIndex(state.cards, data.id)
-	// 	state.cards[index].data = data.data
-	// 	state.cards[index].id = data.id
-	// 	state.cards[index].idLst = data.idLst
-	// 	state.cards[index].owner = data.owner
-	// },
-
 	SAVECARD: function SAVECARD(state, data) {
-		console.log("savecard");
-		console.log(data);
-		var index = arrayIndex(state.lists, data.idLst);
-		var indexId = arrayIndex(state.lists[index].cards, data.id);
-		console.log("index: " + index);
-		console.log("indexId: " + indexId);
-
-		state.lists[index].cards[indexId].data = data.data, state.lists[index].cards[indexId].id = data.id, state.lists[index].cards[indexId].idLst = data.idLst, state.lists[index].cards[indexId].owner = data.owner;
+		var index = arrayIndex(state.store, data.idLst);
+		var cardIdx = arrayIndex(state.store[index].cards, data.id);
+		state.store[index].cards[cardIdx].data = data.data, state.store[index].cards[cardIdx].id = data.id, state.store[index].cards[cardIdx].idLst = data.idLst, state.store[index].cards[cardIdx].owner = data.owner;
 	},
 	DRAGCARD: function DRAGCARD(state, data) {
-		var index = arrayIndex(state.lists, data[0].id);
+		var index = arrayIndex(state.store, data.idLst);
 		// change idLst of moved cards
-		for (var i = data.length - 1; i >= 0; i--) {
-			data[i].idLst = data[0].id;
+		for (var i = data.value.length - 1; i >= 0; i--) {
+			data.value[i].idLst = data.idLst;
 		};
-		data.splice(0, 1);
-		console.log("DRAGCARD");
-		console.log(data);
-		state.lists[index].cards = data;
+		state.store[index].cards = data.value;
 	},
-	DELCARD: function DELCARD(state, id) {
-		var index = arrayIndex(state.cards, id);
-		state.cards.splice(index, 1);
+	DELCARD: function DELCARD(state, data) {
+		var index = arrayIndex(state.store, data.idLst);
+		var cardIdx = arrayIndex(state.store[index].cards, data.id);
+		state.store[index].cards.splice(cardIdx, 1);
 	}
 };
 
@@ -46149,13 +46196,13 @@ var mutations = {
 
 /**
  * Function to identify the object id in the index List
- * @param  {array} array Data array
+ * @param  {data} data Data data
  * @param  {int} id Id of object
  * @return {int} Index for operations
  */
-function arrayIndex(array, id) {
-	for (var i = array.length - 1; i >= 0; i--) {
-		if (array[i].id === id) {
+function arrayIndex(data, id) {
+	for (var i = data.length - 1; i >= 0; i--) {
+		if (data[i].id === id) {
 			return i;
 		}
 	};

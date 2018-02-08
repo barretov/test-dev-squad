@@ -5,21 +5,12 @@ Vue.use(Vuex)
 
 const state = {
 	idx: 1,
-	idxCard: 1,
-	lists: [],
-	cards: [],
+	store: [],
 }
 
 const mutations = {
-	// ADDLIST (state) {
-	// 	state.lists.push({
-	// 		id: state.idxList,
-	// 		name: state.idxList
-	// 	})
-	// 	state.idxList++
-	// },
 	ADDLIST (state) {
-		state.lists.push({
+		state.store.push({
 			id: state.idx,
 			name: state.idx,
 			cards: []
@@ -28,71 +19,48 @@ const mutations = {
 	},
 
 	SAVELIST (state, data) {
-		let index = arrayIndex(state.lists, data.id)
-		state.lists[index].name = data.name
+		let index = arrayIndex(state.store, data.id)
+		state.store[index].name = data.name
 	},
 
 	DELLIST (state, id) {
-		let index = arrayIndex(state.lists, id)
-		state.lists.splice(index, 1)
+		let index = arrayIndex(state.store, id)
+		state.store.splice(index, 1)
 	},
 
-	// ADDCARD (state, id) {
-	// 	state.cards.push({
-	// 		idLst: id,
-	// 		id: state.idxCard,
-	// 		data: state.idxCard
-	// 	})
-	// 	state.idxCard++
-	// },
 	ADDCARD (state, id) {
-		let index = arrayIndex(state.lists, id)
+		let index = arrayIndex(state.store, id)
 
-		state.lists[index].cards.push({
+		state.store[index].cards.push({
 			idLst: id,
 			id: state.idx,
-			data: state.idx
+			data: ''
 		})
 		state.idx++
 	},
 
-	// SAVECARD (state, data) {
-	// 	let index = arrayIndex(state.cards, data.id)
-	// 	state.cards[index].data = data.data
-	// 	state.cards[index].id = data.id
-	// 	state.cards[index].idLst = data.idLst
-	// 	state.cards[index].owner = data.owner
-	// },
-
 	SAVECARD (state, data) {
-		console.log("savecard")
-		console.log(data)
-		let index = arrayIndex(state.lists, data.idLst)
-		let indexId = arrayIndex(state.lists[index].cards, data.id)
-		console.log("index: " + index)
-		console.log("indexId: " + indexId)
-
-			state.lists[index].cards[indexId].data = data.data,
-			state.lists[index].cards[indexId].id = data.id,
-			state.lists[index].cards[indexId].idLst = data.idLst,
-			state.lists[index].cards[indexId].owner = data.owner
+		let index = arrayIndex(state.store, data.idLst)
+		let cardIdx = arrayIndex(state.store[index].cards, data.id)
+		state.store[index].cards[cardIdx].data = data.data,
+		state.store[index].cards[cardIdx].id = data.id,
+		state.store[index].cards[cardIdx].idLst = data.idLst,
+		state.store[index].cards[cardIdx].owner = data.owner
 	},
 
 	DRAGCARD (state, data) {
-		let index = arrayIndex(state.lists, data[0].id)
+		let index = arrayIndex(state.store, data.idLst)
 		// change idLst of moved cards
-		for (var i = data.length - 1; i >= 0; i--) {
-			data[i].idLst = data[0].id
+		for (var i = data.value.length - 1; i >= 0; i--) {
+			data.value[i].idLst = data.idLst
 		};
-		data.splice(0, 1)
-		console.log("DRAGCARD")
-		console.log(data)
-		state.lists[index].cards = data
+		state.store[index].cards = data.value
 	},
 
-	DELCARD (state, id) {
-		let index = arrayIndex(state.cards, id)
-		state.cards.splice(index, 1)
+	DELCARD (state, data) {
+		let index = arrayIndex(state.store, data.idLst)
+		let cardIdx = arrayIndex(state.store[index].cards, data.id)
+		state.store[index].cards.splice(cardIdx, 1)
 	},
 }
 
@@ -103,13 +71,13 @@ export default new Vuex.Store({
 
 /**
  * Function to identify the object id in the index List
- * @param  {array} array Data array
+ * @param  {data} data Data data
  * @param  {int} id Id of object
  * @return {int} Index for operations
  */
- function arrayIndex(array, id) {
- 	for (var i = array.length -1; i >= 0; i--) {
- 		if (array[i].id === id) {
+ function arrayIndex(data, id) {
+ 	for (var i = data.length -1; i >= 0; i--) {
+ 		if (data[i].id === id) {
  			return i
  		}
  	};

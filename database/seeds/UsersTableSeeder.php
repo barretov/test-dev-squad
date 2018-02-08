@@ -34,7 +34,7 @@ class UsersTableSeeder extends Seeder
      */
     private function createUsers()
     {
-        $max = rand(10, 30);
+        $max = rand(8, 10);
         for ($i=0; $i < $max; $i++) {
             $this->createUser($i);
         }
