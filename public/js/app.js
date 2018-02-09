@@ -43809,13 +43809,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			// @TODO:, salvar mudança no banco
 		},
 		invite: function invite() {
-			// ### @TODO: Remove this debug #### //
-			console.log("### is here ### ");
 			this.owner = this.emailInvite;
 			this.flOwner = false;
 			this.flInvite = false;
 			this.flInpOwner = false;
-			// @TODO:, Send email to invite
+
+			axios.post('/emailInvite', { email: this.emailInvite }).then(function (response) {}).catch(function (err) {
+				console.log(err);
+			});
 		}
 	}
 });

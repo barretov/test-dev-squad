@@ -107,13 +107,15 @@
 				// @TODO:, salvar mudança no banco
 			},
 			invite() {
-				// ### @TODO: Remove this debug #### //
-				console.log("### is here ### ");
 				this.owner = this.emailInvite
 				this.flOwner = false
 				this.flInvite = false
 				this.flInpOwner = false
-				// @TODO:, Send email to invite
+
+				axios.post('/emailInvite', {email: this.emailInvite}).then((response) => {
+				}).catch((err) => {
+					console.log(err);
+				});
 			}
 		},
 	}
