@@ -43736,6 +43736,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
 	props: {
@@ -43831,31 +43833,33 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "row" }, [
     _c("div", { staticClass: "form-group" }, [
-      _c("textarea", {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.dataCard,
-            expression: "dataCard"
-          }
-        ],
-        staticClass: "form-control",
-        attrs: { placeholder: "Write something..." },
-        domProps: { value: _vm.dataCard },
-        on: {
-          blur: _vm.saveCard,
-          focus: function($event) {
-            _vm.flOwner = true
-          },
-          input: function($event) {
-            if ($event.target.composing) {
-              return
+      _c("div", { staticClass: "form-group" }, [
+        _c("textarea", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.dataCard,
+              expression: "dataCard"
             }
-            _vm.dataCard = $event.target.value
+          ],
+          staticClass: "form-control",
+          attrs: { placeholder: "Write something..." },
+          domProps: { value: _vm.dataCard },
+          on: {
+            blur: _vm.saveCard,
+            focus: function($event) {
+              _vm.flOwner = true
+            },
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.dataCard = $event.target.value
+            }
           }
-        }
-      }),
+        })
+      ]),
       _vm._v(" "),
       _c(
         "div",
@@ -43960,9 +43964,11 @@ var render = function() {
               }
             },
             [
-              _c("option", { attrs: { disabled: "", value: "" } }, [
-                _vm._v("Select a worner")
-              ]),
+              _c(
+                "option",
+                { attrs: { disabled: "", selected: "", value: "" } },
+                [_vm._v("Select a owner")]
+              ),
               _vm._v(" "),
               _c("option", { attrs: { value: "0" } }, [
                 _vm._v("Invite a person")

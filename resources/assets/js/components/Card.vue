@@ -2,7 +2,9 @@
 	<div class="row">
 		<div class="form-group">
 
-			<textarea v-model="dataCard" class="form-control" @blur="saveCard" placeholder="Write something..." @focus="flOwner = true"/>
+			<div class="form-group">
+				<textarea v-model="dataCard" class="form-control" @blur="saveCard" placeholder="Write something..." @focus="flOwner = true"/>
+			</div>
 
 			<div v-show="flOwner">
 				<button @click="flInpOwner = true" class="btn-link" @focus="flOwner = true">
@@ -17,7 +19,7 @@
 			<div v-show="flInpOwner" @change="changeOwner">
 				{{getUsers}}
 				<select v-model="owner" class="form-control">
-					<option disabled value="">Select a worner</option>
+					<option disabled selected value="">Select a owner</option>
 					<option value="0">Invite a person</option>
 					<option v-for="user in users">{{user.name}}</option>
 				</select>
