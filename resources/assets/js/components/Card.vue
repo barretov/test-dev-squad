@@ -76,7 +76,7 @@
 					id: this.id,
 					idLst: this.idLst,
 					data: this.dataCard,
-					owner: this.user
+					owner: this.owner? this.owner : this.user
 				})
 				this.flOwner = false
 				this.flInvite = false
@@ -105,14 +105,15 @@
 				} else {
 					this.flInpOwner = false
 					this.flOwner = false
+					this.saveCard()
 				}
-				// @TODO:, salvar mudança no banco
 			},
 			invite() {
 				this.owner = this.emailInvite
 				this.flOwner = false
 				this.flInvite = false
 				this.flInpOwner = false
+				this.saveCard()
 
 				axios.post('/emailInvite', {email: this.emailInvite}).then((response) => {
 				}).catch((err) => {

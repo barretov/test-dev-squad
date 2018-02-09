@@ -43776,7 +43776,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				id: this.id,
 				idLst: this.idLst,
 				data: this.dataCard,
-				owner: this.user
+				owner: this.owner ? this.owner : this.user
 			});
 			this.flOwner = false;
 			this.flInvite = false;
@@ -43807,14 +43807,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			} else {
 				this.flInpOwner = false;
 				this.flOwner = false;
+				this.saveCard();
 			}
-			// @TODO:, salvar mudança no banco
 		},
 		invite: function invite() {
 			this.owner = this.emailInvite;
 			this.flOwner = false;
 			this.flInvite = false;
 			this.flInpOwner = false;
+			this.saveCard();
 
 			axios.post('/emailInvite', { email: this.emailInvite }).then(function (response) {}).catch(function (err) {
 				console.log(err);
@@ -46153,18 +46154,31 @@ var mutations = {
 	ADDLIST: function ADDLIST(state) {
 		state.store.push({
 			id: state.idx,
-			name: state.idx,
+			name: '',
 			cards: []
 		});
+
+		axios.post('/lists', { id: state.idx }).then(function (response) {}).catch(function (err) {
+			console.log(err);
+		});
+
 		state.idx++;
 	},
 	SAVELIST: function SAVELIST(state, data) {
 		var index = arrayIndex(state.store, data.id);
 		state.store[index].name = data.name;
+
+		axios.put('/lists/' + data.id, { name: data.name }).then(function (response) {}).catch(function (err) {
+			console.log(err);
+		});
 	},
 	DELLIST: function DELLIST(state, id) {
 		var index = arrayIndex(state.store, id);
 		state.store.splice(index, 1);
+
+		axios.delete('/lists/' + id).then(function (response) {}).catch(function (err) {
+			console.log(err);
+		});
 	},
 	ADDCARD: function ADDCARD(state, id) {
 		var index = arrayIndex(state.store, id);
@@ -46174,12 +46188,34 @@ var mutations = {
 			id: state.idx,
 			data: ''
 		});
+
+		axios.post('/cards', { id: state.idx, idLst: id }).then(function (response) {}).catch(function (err) {
+			console.log(err);
+		});
+
 		state.idx++;
 	},
 	SAVECARD: function SAVECARD(state, data) {
 		var index = arrayIndex(state.store, data.idLst);
 		var cardIdx = arrayIndex(state.store[index].cards, data.id);
 		state.store[index].cards[cardIdx].data = data.data, state.store[index].cards[cardIdx].id = data.id, state.store[index].cards[cardIdx].idLst = data.idLst, state.store[index].cards[cardIdx].owner = data.owner;
+
+		axios.put('/cards/' + data.id, {
+			data: data.data,
+			idLst: data.idLst,
+			owner: data.owner
+		}).then(function (response) {}).catch(function (err) {
+			console.log(err);
+		});
+	},
+	DELCARD: function DELCARD(state, data) {
+		var index = arrayIndex(state.store, data.idLst);
+		var cardIdx = arrayIndex(state.store[index].cards, data.id);
+		state.store[index].cards.splice(cardIdx, 1);
+
+		axios.delete('/cards/' + data.id).then(function (response) {}).catch(function (err) {
+			console.log(err);
+		});
 	},
 	DRAGCARD: function DRAGCARD(state, data) {
 		var index = arrayIndex(state.store, data.idLst);
@@ -46188,11 +46224,6 @@ var mutations = {
 			data.value[i].idLst = data.idLst;
 		};
 		state.store[index].cards = data.value;
-	},
-	DELCARD: function DELCARD(state, data) {
-		var index = arrayIndex(state.store, data.idLst);
-		var cardIdx = arrayIndex(state.store[index].cards, data.id);
-		state.store[index].cards.splice(cardIdx, 1);
 	}
 };
 

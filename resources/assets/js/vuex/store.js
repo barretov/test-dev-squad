@@ -12,20 +12,36 @@ const mutations = {
 	ADDLIST (state) {
 		state.store.push({
 			id: state.idx,
-			name: state.idx,
+			name: '',
 			cards: []
 		})
+
+		axios.post('/lists', {id: state.idx}).then((response) => {
+		}).catch((err) => {
+			console.log(err);
+		});
+
 		state.idx++
 	},
 
 	SAVELIST (state, data) {
 		let index = arrayIndex(state.store, data.id)
 		state.store[index].name = data.name
+
+		axios.put('/lists/'+ data.id, {name: data.name}).then((response) => {
+		}).catch((err) => {
+			console.log(err);
+		});
 	},
 
 	DELLIST (state, id) {
 		let index = arrayIndex(state.store, id)
 		state.store.splice(index, 1)
+
+		axios.delete('/lists/'+ id).then((response) => {
+		}).catch((err) => {
+			console.log(err);
+		});
 	},
 
 	ADDCARD (state, id) {
@@ -36,6 +52,12 @@ const mutations = {
 			id: state.idx,
 			data: ''
 		})
+
+		axios.post('/cards', {id: state.idx, idLst: id}).then((response) => {
+		}).catch((err) => {
+			console.log(err);
+		});
+
 		state.idx++
 	},
 
@@ -46,6 +68,26 @@ const mutations = {
 		state.store[index].cards[cardIdx].id = data.id,
 		state.store[index].cards[cardIdx].idLst = data.idLst,
 		state.store[index].cards[cardIdx].owner = data.owner
+
+		axios.put('/cards/'+ data.id, {
+			data: data.data,
+			idLst: data.idLst,
+			owner: data.owner
+		}).then((response) => {
+		}).catch((err) => {
+			console.log(err);
+		});
+	},
+
+	DELCARD (state, data) {
+		let index = arrayIndex(state.store, data.idLst)
+		let cardIdx = arrayIndex(state.store[index].cards, data.id)
+		state.store[index].cards.splice(cardIdx, 1)
+
+		axios.delete('/cards/'+ data.id).then((response) => {
+		}).catch((err) => {
+			console.log(err);
+		});
 	},
 
 	DRAGCARD (state, data) {
@@ -55,12 +97,6 @@ const mutations = {
 			data.value[i].idLst = data.idLst
 		};
 		state.store[index].cards = data.value
-	},
-
-	DELCARD (state, data) {
-		let index = arrayIndex(state.store, data.idLst)
-		let cardIdx = arrayIndex(state.store[index].cards, data.id)
-		state.store[index].cards.splice(cardIdx, 1)
 	},
 }
 

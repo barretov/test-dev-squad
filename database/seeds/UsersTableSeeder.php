@@ -34,11 +34,10 @@ class UsersTableSeeder extends Seeder
      */
     private function createUsers()
     {
-        $max = rand(8, 10);
-        for ($i=0; $i < $max; $i++) {
+        for ($i=0; $i < 10; $i++) {
             $this->createUser($i);
         }
-        $this->command->info($max . ' data mass of users created');
+        $this->command->info('10 Data mass of users created');
     }
 
     /**
@@ -50,8 +49,8 @@ class UsersTableSeeder extends Seeder
     private function createUser($index)
     {
         return User::create([
-            'email' => 'email' . $index . '@mail.com',
-            'name'  =>'User '. $index,
+            'email' => 'email.user.' . $index . '@mail.com',
+            'name'  =>'User Examp '. $index,
             'password' => bcrypt('123456')
         ]);
     }
