@@ -3,28 +3,28 @@
 
 		<div class="well well-sm">
 			<div class="form-group" align="center">
-				<input v-model="titleList" class="form-control" @blur="saveList"
-				 @focus="options = true" placeholder="New List...">
+				<input v-model="titleList" class="form-control" @blur="saveList" @focus="options = true" placeholder="New List..." v-show="flTitle" @keyup.13="flTitle = false">
 
-				<button @click="dialog" v-if="options" class="btn-link pull-right bottom" @focus="options = true">
+				<span @click="flTitle = true" v-show="!flTitle" class="text-info">
+					<legend>{{titleList}}</legend>
+				</span>
+
+				<button @click="dialog" v-show="flTitle" class="btn-link pull-right" @focus="flTitle = true">
 					Delete List <i class="glyphicon glyphicon-trash"></i>
 				</button>
 			</div>
 
-			<draggable v-model="dragCard" :options="{group:'cards'}" class="drag-area col-xs-12">
+			<draggable v-model="dragCard" :options="{group:'cards'}" class="col-xs-12">
 				<div v-for="card in getCards" :key="card.id">
-					<card :id="card.id" :idLst="card.idLst" :user="user" :data="card.data"/>
+					<card :id="card.id" :idLst="card.idLst" :user="card.name" :userId="card.owner" :data="card.data" :crd_invite="card.crd_invite"/>
 				</div>
 			</draggable>
 
-			<div class="form-group">
-				<button @click="addCard" class="btn-link">
-					Add Card <i class="glyphicon glyphicon-file"></i>
-				</button>
-			</div>
+			<button @click="addCard" class="btn-link">
+				Add Card ...
+			</button>
 		</div>
 
-		<v-dialog/>
 	</div>
 </template>
 
@@ -33,16 +33,13 @@ import Card from './Card'
 import draggable from 'vuedraggable'
 
 export default {
-	props:
-	 {
-		'id': {type: Number, required: true},
-		'user': {type: String, required: true},
-	},
+	props: ['id', 'name', 'usrId', 'usrName', 'usrEmail'],
 
 	data: function () {
 		return {
-			titleList: '',
+			titleList: this.name,
 			options: false,
+			flTitle: false,
 		}
 	},
 
@@ -52,27 +49,35 @@ export default {
 				id: this.id,
 				name: this.titleList
 			})
+
 			this.options = false
+			this.flTitle = false
 		},
+
 		delList() {
 			this.$store.commit('DELLIST', this.id)
 		},
+
 		addCard() {
-			this.$store.commit('ADDCARD', this.id)
+			this.$store.commit('ADDCARD', {
+				idLst: this.id,
+				usrId: this.usrId,
+				usrName: this.usrName
+			})
 		},
+
 		dialog() {
 		  this.$modal.show('dialog', {
 		    title: 'Delete list',
 		    text: 'Are you sure? It will remove all cards of this list!',
 		    buttons: [
 		      {
-		        title: '<span class="text-primary">'
-		        	+'No <i class="glyphicon glyphicon-remove"></i></span>',
+		        title: 'No <i class="glyphicon glyphicon-remove text-danger"/>',
+		        	handler: () => {this.$modal.hide('dialog'), this.flTitle = false},
 		        default: true
 		      },
 		      {
-		        title: '<span class="text-danger">'
-		        	+'Yes <i class="glyphicon glyphicon-ok"></i></span>',
+		        title: 'Yes <i class="glyphicon glyphicon-ok"/>',
 		        handler: () => {this.$modal.hide('dialog'), this.delList()}
 		      }
 		   ]
@@ -82,21 +87,24 @@ export default {
 
 	computed: {
 		getCards() {
+			// refresh title after pusher event
+			this.titleList = this.name
 			let data = this.$store.state.store
 
 			for (var i = data.length -1; i >= 0; i--) {
-				if (data[i].id === this.id) {
+				if (data[i].id == this.id) {
 					return data[i].cards
 				}
-			};
+			}
 		},
+
 		dragCard: {
 		    get() {
-				this.getCards
+		    	return this.getCards
 		    },
 		    set(value) {
 		        this.$store.commit('DRAGCARD', {idLst: this.id, value: value})
-		    },
+		    }
 		}
 	},
 
@@ -106,8 +114,3 @@ export default {
 	}
 }
 </script>
-<style>
-.drag-area {
-	 min-height: 20px;
-}
-</styel>

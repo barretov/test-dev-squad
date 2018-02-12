@@ -14,10 +14,9 @@ class CreateListsTable extends Migration
     public function up()
     {
         Schema::create('lists', function (Blueprint $table) {
-            $table->integer('id')->comment('List index');
+            $table->increments('id')->comment('List index');
             $table->string('name', 80)->nullable()->comment('List name');
             $table->timestamps();
-            $table->primary('id');
         });
     }
 

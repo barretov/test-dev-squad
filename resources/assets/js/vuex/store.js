@@ -4,34 +4,35 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 const state = {
-	idx: 1,
 	store: [],
+	users: '',
 }
 
 const mutations = {
 	ADDLIST (state) {
-		state.store.push({
-			id: state.idx,
-			name: '',
-			cards: []
-		})
-
-		axios.post('/lists', {id: state.idx}).then((response) => {
+		axios.post('/lists').then((response) => {
+			state.store.push({
+				id: response.data.id,
+				name: 'New List',
+				cards: []
+			})
+			refreshEvent()
 		}).catch((err) => {
-			console.log(err);
-		});
-
-		state.idx++
+			console.log(err)
+		})
 	},
 
 	SAVELIST (state, data) {
 		let index = arrayIndex(state.store, data.id)
-		state.store[index].name = data.name
 
-		axios.put('/lists/'+ data.id, {name: data.name}).then((response) => {
-		}).catch((err) => {
-			console.log(err);
-		});
+		if (state.store[index].name != data.name) {
+			state.store[index].name = data.name
+			axios.put('/lists/'+ data.id, {name: data.name}).then((response) => {
+				refreshEvent()
+			}).catch((err) => {
+				console.log(err)
+			})
+		}
 	},
 
 	DELLIST (state, id) {
@@ -39,44 +40,54 @@ const mutations = {
 		state.store.splice(index, 1)
 
 		axios.delete('/lists/'+ id).then((response) => {
+			refreshEvent()
 		}).catch((err) => {
-			console.log(err);
-		});
+			console.log(err)
+		})
 	},
 
-	ADDCARD (state, id) {
-		let index = arrayIndex(state.store, id)
+	ADDCARD (state, data) {
+		let index = arrayIndex(state.store, data.idLst)
 
-		state.store[index].cards.push({
-			idLst: id,
-			id: state.idx,
-			data: ''
-		})
-
-		axios.post('/cards', {id: state.idx, idLst: id}).then((response) => {
+		axios.post('/cards', {idLst: data.idLst}).then((response) => {
+			state.store[index].cards.push({
+				idLst: data.idLst,
+				id: response.data.id,
+				owner: data.usrId,
+				name: data.usrName,
+				crd_order: response.data.id,
+				data: '',
+			})
+			refreshEvent()
 		}).catch((err) => {
-			console.log(err);
-		});
-
-		state.idx++
+			console.log(err)
+		})
 	},
 
 	SAVECARD (state, data) {
 		let index = arrayIndex(state.store, data.idLst)
 		let cardIdx = arrayIndex(state.store[index].cards, data.id)
-		state.store[index].cards[cardIdx].data = data.data,
-		state.store[index].cards[cardIdx].id = data.id,
-		state.store[index].cards[cardIdx].idLst = data.idLst,
-		state.store[index].cards[cardIdx].owner = data.owner
+		let card = state.store[index].cards[cardIdx]
 
-		axios.put('/cards/'+ data.id, {
-			data: data.data,
-			idLst: data.idLst,
-			owner: data.owner
-		}).then((response) => {
-		}).catch((err) => {
-			console.log(err);
-		});
+		if (card.data != data.data ||
+			card.owner != data.owner ||
+			card.crdInvite != data.crdInvite) {
+
+			card.data = data.data,
+			card.owner = data.owner
+			card.crdInvite = data.crdInvite
+
+			axios.put('/cards/'+ data.id, {
+				data: data.data,
+				owner: data.owner,
+				idLst: data.idLst,
+				crdInvite: data.crdInvite
+			}).then((response) => {
+				refreshEvent()
+			}).catch((err) => {
+				console.log(err)
+			})
+		}
 	},
 
 	DELCARD (state, data) {
@@ -85,18 +96,35 @@ const mutations = {
 		state.store[index].cards.splice(cardIdx, 1)
 
 		axios.delete('/cards/'+ data.id).then((response) => {
+			refreshEvent()
 		}).catch((err) => {
-			console.log(err);
-		});
+			console.log(err)
+		})
 	},
 
 	DRAGCARD (state, data) {
 		let index = arrayIndex(state.store, data.idLst)
-		// change idLst of moved cards
-		for (var i = data.value.length - 1; i >= 0; i--) {
+
+		for (let i = data.value.length - 1; i >= 0; i--) {
+
+			if (data.value[i].idLst != data.idLst) {
+				data.value[i].idLst = data.idLst
+			}
 			data.value[i].idLst = data.idLst
-		};
+		}
+
+		axios.put('/cards-order/', {data: data}).then((response) => {
+			refreshEvent()
+		}).catch((err) => {
+			console.log(err)
+		})
+
 		state.store[index].cards = data.value
+	},
+
+	UPSTORE (state, data) {
+		state.store = ''
+		state.store = data
 	},
 }
 
@@ -107,14 +135,27 @@ export default new Vuex.Store({
 
 /**
  * Function to identify the object id in the index List
+ *
  * @param  {data} data Data data
  * @param  {int} id Id of object
  * @return {int} Index for operations
  */
  function arrayIndex(data, id) {
- 	for (var i = data.length -1; i >= 0; i--) {
- 		if (data[i].id === id) {
+ 	for (let i = data.length -1; i >= 0; i--) {
+ 		if (data[i].id == id) {
  			return i
  		}
- 	};
+ 	}
+ }
+
+ /**
+  * Function for call a event to refresh all clients
+  *
+  * @return void
+  */
+ function refreshEvent() {
+ 	axios.get('/fire-refresh-event').then((response) => {
+ 	}).catch((err) => {
+ 		console.log(err)
+ 	})
  }

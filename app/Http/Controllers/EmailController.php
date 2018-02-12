@@ -9,16 +9,6 @@ use Illuminate\Http\Request;
 class EmailController extends Controller
 {
     /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    /**
      * Method for send email for invite a new user
      * @param  Request $request User email
      * @return String           Confirmation message

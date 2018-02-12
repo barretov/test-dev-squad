@@ -1,14 +1,13 @@
 <template>
 	<div class="row">
-		<div class="form-group">
 
-			<div class="form-group">
-				<textarea v-model="dataCard" class="form-control" @blur="saveCard" placeholder="Write something..." @focus="flOwner = true"/>
-			</div>
+		<div class="form-group">
+			<textarea v-model="dataCard" class="form-control text-justify" @blur="saveCard" placeholder="Write something..." @focus="flOwner = true"/>
 
 			<div v-show="flOwner">
 				<button @click="flInpOwner = true" class="btn-link" @focus="flOwner = true">
-					<i class="glyphicon glyphicon-user"></i> {{owner != 0? owner.substr(0,13) : user.substr(0,13)}} ...
+					<i class="glyphicon glyphicon-user"></i>
+					{{ crdInvite? crdInvite.substr(0, 18) : ownerName.substr(0, 18) }}
 				</button>
 
 				<button @click="dialogDelCard" class="btn-link pull-right" @focus="flOwner = true">
@@ -17,11 +16,10 @@
 			</div>
 
 			<div v-show="flInpOwner" @change="changeOwner">
-				{{getUsers}}
-				<select v-model="owner" class="form-control">
+				<select v-model="ownerId" class="form-control">
 					<option disabled selected value="">Select a owner</option>
 					<option value="0">Invite a person</option>
-					<option v-for="user in users">{{user.name}}</option>
+					<option v-for="user in getData" :value="user.id">{{user.name}}</option>
 				</select>
 			</div>
 		</div>
@@ -29,7 +27,7 @@
 		<div v-show="flInvite">
 			<div class="form-group">
 				<div class="input-group">
-				    <input v-model="emailInvite" type="email" class="form-control" placeholder="E-mail to invite">
+				    <input v-model="crdInvite" type="email" class="form-control" placeholder="E-mail to invite">
 				    <span class="input-group-btn">
 				      <button @click="invite" class="btn btn-primary"><i class="glyphicon glyphicon-send"></i></button>
 				    </span>
@@ -42,32 +40,29 @@
 
 <script>
 	export default {
-		props: {
-			'id': {type: Number, required: true},
-			'idLst': {type: Number, required: true},
-			'user': {type: String, required: true},
-			'data': {type: String, required: true},
-		},
+		props: ['id', 'idLst', 'user', 'userId', 'data', 'crd_invite'],
+
 		data: function () {
 			return {
-				users: '',
-				dataCard: this.data,
-				owner: '',
-				emailInvite: '',
+				ownerId: '',
+				flTxt: false,
 				flOwner: false,
 				flInvite: false,
 				flInpOwner: false,
+				dataCard: this.data,
+				ownerName: this.user,
+				crdInvite: this.crd_invite,
 			}
 		},
 
 		computed: {
-			getUsers() {
-				axios.get('/users').then((response) => {
-					this.users =  response.data
-				}).catch((err) => {
-					console.log(err);
-				});
-			}
+			getData() {
+				let state = this.$store.state
+				this.dataCard = this.data
+				this.ownerName = this.user
+				this.crdInvite = this.crd_invite
+				return state.users
+			},
 		},
 
 		methods: {
@@ -76,50 +71,68 @@
 					id: this.id,
 					idLst: this.idLst,
 					data: this.dataCard,
-					owner: this.owner? this.owner : this.user
+					owner: this.ownerId? this.ownerId : this.userId,
+					crdInvite: this.crdInvite
 				})
+
+				this.ownerId = ''
 				this.flOwner = false
 				this.flInvite = false
 			},
+
 			delCard() {
 				this.$store.commit('DELCARD', {idLst: this.idLst, id: this.id})
 			},
+
+			changeOwner() {
+				if (0 == this.ownerId) {
+					this.flInvite = true
+				} else {
+					this.flInpOwner = false
+					this.flOwner = false
+
+					let users = this.$store.state.users
+					// update name for a new owner
+					for (let i = 0; users.length >= 0; i++) {
+						if (users[i].id === this.ownerId) {
+							this.ownerName = users[i].name
+							break
+						}
+					}
+					this.crdInvite = ''
+					this.saveCard()
+				}
+			},
+
+			invite() {
+				this.flOwner = false
+				this.flInvite = false
+				this.flInpOwner = false
+				this.ownerId = ''
+				this.saveCard()
+
+				axios.post('/email-invite', {email: this.crdInvite}).then((response) => {
+				}).catch((err) => {
+					console.log(err)
+				})
+			},
+
 			dialogDelCard() {
 				this.$modal.show('dialog', {
 				title: 'Delete card',
 				text: 'Are you sure?',
 				buttons: [
 					{
-						title: '<span class="text-primary">No <i class="glyphicon glyphicon-remove"></i></span>',
+						title: 'No <i class="glyphicon glyphicon-remove text-danger"/>',
+						handler:() => {this.$modal.hide('dialog'), this.flOwner = false},
 						default: true
 					},
 					{
-						title: '<span class="text-danger">Yes <i class="glyphicon glyphicon-ok"></i></span>',
+						title: 'Yes <i class="glyphicon glyphicon-ok text-info"/>',
 						handler: () => {this.$modal.hide('dialog'), this.delCard()}
 					}]
 				})
-			},
-			changeOwner() {
-				if (0 == this.owner) {
-					this.flInvite = true
-				} else {
-					this.flInpOwner = false
-					this.flOwner = false
-					this.saveCard()
-				}
-			},
-			invite() {
-				this.owner = this.emailInvite
-				this.flOwner = false
-				this.flInvite = false
-				this.flInpOwner = false
-				this.saveCard()
-
-				axios.post('/emailInvite', {email: this.emailInvite}).then((response) => {
-				}).catch((err) => {
-					console.log(err);
-				});
 			}
-		},
+		}
 	}
 </script>

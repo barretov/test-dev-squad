@@ -3,38 +3,37 @@
 namespace App\Http\Controllers;
 
 use App\Lists;
+use App\Card;
 use Illuminate\Http\Request;
 
 class ListController extends Controller
 {
 
     /**
-     * Create a new controller instance.
+     * Method for get lists
      *
-     * @return void
+     * @return object Lists
      */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     public function index()
     {
-        // $lists = Lists::orderBy('created_at', 'desc');
+        return \Response::json(Lists::all(), 200);
     }
 
     /**
      * Method for save list
      *
-     * @param  Request $request List data
      * @return object Result message
      */
-    public function store(Request $request)
+    public function store()
     {
         $list = new Lists;
-        $list->id = $request->id;
+        $list->name = 'New List';
         $list->save();
-        return json_encode(['message' => 'list created']);
+
+        return \Response::json([
+            'success' => true,
+            'id' => $list->id
+        ], 200);
     }
 
     /**
@@ -49,7 +48,7 @@ class ListController extends Controller
         $list = Lists::findOrFail($idx);
         $list->name = $request->name;
         $list->save();
-        return json_encode(['message' => 'list updated']);
+        return \Response::json(['success' => true], 200);
     }
 
     /**
@@ -60,8 +59,9 @@ class ListController extends Controller
      */
     public function destroy($idx)
     {
-        $list = Lists::findOrFail($idx);
-        $list->delete();
-        return json_encode(['message' => 'list deleted']);
+        // remove cards of the list, if exists
+        Card::where('idLst', $idx)->delete();
+        Lists::where('id', $idx)->delete();
+        return \Response::json(['success' => true], 200);
     }
 }
