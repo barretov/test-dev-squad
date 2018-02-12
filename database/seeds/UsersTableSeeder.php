@@ -12,7 +12,7 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('users')->truncate();
+        //DB::table('users')->truncate();
         $this->createFixedUsers();
         $this->createUsers();
     }

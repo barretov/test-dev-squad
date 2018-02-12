@@ -12,7 +12,7 @@ class ListsTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('lists')->truncate();
+        //DB::table('lists')->truncate();
         $this->createExampleList();
     }
 

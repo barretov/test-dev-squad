@@ -15,8 +15,8 @@ class CreateCardsTable extends Migration
     {
         Schema::create('cards', function (Blueprint $table) {
             $table->increments('id')->comment('Card index');
-            $table->integer('idLst')->comment('List index');
-            $table->integer('owner')->comment('Card owner');
+            $table->unsignedInteger('idLst')->comment('List index');
+            $table->unsignedInteger('owner')->comment('Card owner');
             $table->integer('crd_order')->comment('Order of car in the list');
             $table->string('data', 800)->nullable()->comment('Card data');
             $table->string('crd_invite', 100)->nullable()->comment('Email for invite new user');
