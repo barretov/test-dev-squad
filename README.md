@@ -1,5 +1,5 @@
 # test-dev-squad
-Test for DevSquad
+Test for DevSquad (clone trello project)
 
 	To run
 	- composer install
